@@ -1,0 +1,30 @@
+{
+  "Platforms": [
+    {
+      "X": 100,
+      "Y": 300,
+      "Width": 200,
+      "Height": 20
+    },
+    {
+      "X": 300,
+      "Y": 200,
+      "Width": 150,
+      "Height": 20
+    }
+  ],
+  "Player": {
+    "X": 50,
+    "Y": 50,
+    "Width": 30,
+    "Height": 50
+  },
+  "Balloons": [
+    {
+      "X": 200,
+      "Y": 100,
+      "Width": 40,
+      "Height": 40
+    }
+  ]
+}
