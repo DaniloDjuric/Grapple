@@ -22,7 +22,7 @@ namespace Grapple
         Texture2D ninjaSprite;
         Texture2D balloonSprite;
         Texture2D platformSprite;
-        int i = 0;
+
         public LevelView(ContentManager content)
         {
             ninjaSprite = content.Load<Texture2D>("ninja");
@@ -33,6 +33,9 @@ namespace Grapple
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
         {
 
+            // Dictionary {objectType ; Sprite}
+            // objectType: Player, Platform, Baloon
+            // Sprite(new script) +texture +crop +color;
 
             // Draw platforms
             foreach (var platform in levelModel.Platforms)
@@ -55,7 +58,7 @@ namespace Grapple
             spriteBatch.Draw(ninjaSprite,
                 new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
                 new Rectangle(135, 135, 500, 960),
-                Color.White);
+                Color.DarkGray);
         }
     }
 }

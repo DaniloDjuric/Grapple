@@ -37,6 +37,11 @@ namespace Grapple
             //shopController;
         }
 
+        public void Update(GameTime gameTime)
+        {
+            levelController.Update(gameTime); 
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             // Later this can call "MenuController.Draw" when I have a Menu

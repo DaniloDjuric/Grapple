@@ -36,7 +36,7 @@ namespace Grapple
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // Controller calls for user input
+            gameController.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -47,8 +47,6 @@ namespace Grapple
 
             spriteBatch.Begin();
 
-            // ***:Question:***
-            // Should this call View directy or through the conroller
             gameController.Draw(spriteBatch);
 
             spriteBatch.End();
