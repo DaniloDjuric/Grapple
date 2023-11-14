@@ -20,8 +20,5 @@ namespace Grapple.Models
 
         [JsonPropertyName("Height")]
         public float Height { get; set; }
-
-        //[JsonPropertyName("glass")]
-        //public bool Glass { get; set; }
     }
 }

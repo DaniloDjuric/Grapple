@@ -10,6 +10,8 @@ namespace Grapple
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private GameController gameController;
+        
+        //  Screen size : 800 x 480
 
         public Game1()
         {

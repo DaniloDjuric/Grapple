@@ -22,6 +22,7 @@ namespace Grapple
         Texture2D ninjaSprite;
         Texture2D balloonSprite;
         Texture2D platformSprite;
+        int i = 0;
         public LevelView(ContentManager content)
         {
             ninjaSprite = content.Load<Texture2D>("ninja");
@@ -31,20 +32,30 @@ namespace Grapple
 
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
         {
-            // Draw player
-            spriteBatch.Draw(ninjaSprite, new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height), Color.White);
-            
+
+
             // Draw platforms
             foreach (var platform in levelModel.Platforms)
             {
-                spriteBatch.Draw(platformSprite, new Rectangle((int)platform.X, (int)platform.Y, (int)platform.Width, (int)platform.Height), Color.White);
+                spriteBatch.Draw(platformSprite,
+                    new Rectangle((int)platform.X, (int)platform.Y, (int)platform.Width, (int)platform.Height),
+                    new Rectangle(130, 70, 170, 800),
+                    Color.White);
             }
 
             // Draw balloons
             foreach (var enemy in levelModel.Balloons)
             {
-                spriteBatch.Draw(balloonSprite, new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height), Color.White);
+                spriteBatch.Draw(balloonSprite,
+                    new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height),
+                    Color.Lime);
             }
+
+            // Draw player
+            spriteBatch.Draw(ninjaSprite,
+                new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
+                new Rectangle(135, 135, 500, 960),
+                Color.White);
         }
     }
 }
