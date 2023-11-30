@@ -3,7 +3,8 @@
     "X": 10,
     "Y": 150,
     "Width": 100,
-    "Height": 160
+    "Height": 160,
+    "Speed":  120
   },
 
   "Platforms": [

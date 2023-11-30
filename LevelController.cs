@@ -23,65 +23,75 @@ namespace Grapple
     {
         private LevelModel levelModel;
         private LevelView levelView;
+        private Physics physics;
+
         private Vector2 targetPosition;
-        private float movementSpeed = 120f;
-        private int inputsAllowed = 2;
-        private int inputsLeft = 2;
+        //private int inputsAllowed = 3;
+        //private int inputsLeft = 2;
 
         public LevelController(LevelModel model, LevelView view)
         {
             levelModel = model;
             levelView = view;
+            physics = new Physics(levelModel);
         }
+
+        // TouchPanel.GetState();    =>      For mobile funcionality
+        // (The rest of the code stays mostly the same, Mouse will be used for easier testing) 
 
         public void Update(GameTime gameTime)
         {
-            HandleInput();
+            //if (TouchPanel.GetState().Count > 0)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                BalloonCollissionCheck(gameTime);
 
-            UpdateSmoothMovement(gameTime);
+                ChangeTarget(gameTime);
+            }
+
+            physics.MoveTowards(targetPosition, gameTime);            
         }
 
         private void HandleInput()
         {
-            // TouchPanel.GetState();    =>      For mobile funcionality
-            // (The rest of the code stays mostly the same, Mouse will be used for easier testing) 
-
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                // The ninja can only change his possition 2 times, pop ballons to get more moves
-                inputsLeft -= 1;
+                // Call the Raycast method from Physics and update targetPosition
+                Vector2 playerPos = new Vector2(levelModel.Player.X, levelModel.Player.Y);
+                Vector2 intersectionPoint = physics.Raycast(playerPos, new Vector2(Mouse.GetState().X, Mouse.GetState().Y));
+
+                if (intersectionPoint != Vector2.Zero)
+                {
+                    targetPosition = intersectionPoint;
+                }
+                else
+                {
+                    targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                }
             }
         }
 
-        private void UpdateSmoothMovement(GameTime gameTime)
+        private void ChangeTarget(GameTime gameTime)
         {
-            // Simple collision detection for clicking on the balloon
-            if ((targetPosition.X > levelModel.Balloons[0].X &&
-                targetPosition.X < (levelModel.Balloons[0].X + levelModel.Balloons[0].Width)) &&
-                (targetPosition.Y > levelModel.Balloons[0].Y &&
-                targetPosition.Y < (levelModel.Balloons[0].Y + levelModel.Balloons[0].Height)))
+            // The ninja can only change his possition 2 times, pop ballons to get more moves
+            if (new Vector2(Mouse.GetState().X, Mouse.GetState().Y) != targetPosition)
+            {
+                targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            }
+        }
+
+        private void BalloonCollissionCheck(GameTime gameTime)
+        {
+            // Simple TEPORARY collision detection for clicking on the balloon
+            if ((Mouse.GetState().X > levelModel.Balloons[0].X &&
+                Mouse.GetState().X < (levelModel.Balloons[0].X + levelModel.Balloons[0].Width)) &&
+                (Mouse.GetState().Y > levelModel.Balloons[0].Y &&
+                Mouse.GetState().Y < (levelModel.Balloons[0].Y + levelModel.Balloons[0].Height)))
             {
                 levelModel.Balloons[0].X = new Random().NextInt64(750);
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
 
                 // The ninja can keep moving after popping a balloon
-                inputsLeft = inputsAllowed;
-            }
-
-
-            // Moving the player to the pressed possition if he haves available moves
-            if (inputsLeft > 0)
-            {
-                Vector2 direction = Vector2.Normalize(targetPosition - new Vector2(levelModel.Player.X, levelModel.Player.Y));
-
-                Vector2 newPosition = new Vector2(
-                    levelModel.Player.X + direction.X * movementSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds,
-                    levelModel.Player.Y + direction.Y * movementSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds
-                );
-
-                levelModel.Player.X = newPosition.X;
-                levelModel.Player.Y = newPosition.Y;
             }
         }
 
