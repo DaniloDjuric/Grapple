@@ -44,31 +44,26 @@ namespace Grapple
             //if (TouchPanel.GetState().Count > 0)
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                BalloonCollissionCheck(gameTime);
 
                 ChangeTarget(gameTime);
+                //HandleInput();
             }
-
+            BalloonCollissionCheck(gameTime);
             physics.MoveTowards(targetPosition, gameTime);            
         }
 
         private void HandleInput()
         {
+            Vector2 playerPos = new Vector2(levelModel.Player.X, levelModel.Player.Y);
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                // Call the Raycast method from Physics and update targetPosition
-                Vector2 playerPos = new Vector2(levelModel.Player.X, levelModel.Player.Y);
-                Vector2 intersectionPoint = physics.Raycast(playerPos, new Vector2(Mouse.GetState().X, Mouse.GetState().Y));
-
-                if (intersectionPoint != Vector2.Zero)
-                {
-                    targetPosition = intersectionPoint;
-                }
-                else
-                {
-                    targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                }
+                // Calculate the target position using the extended line until it hits a platform
+                Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                targetPosition = physics.CalculateTargetPosition(playerPos, mousePosition);
             }
+
+            System.Diagnostics.Debug.WriteLine(targetPosition);
         }
 
         private void ChangeTarget(GameTime gameTime)
@@ -82,16 +77,19 @@ namespace Grapple
 
         private void BalloonCollissionCheck(GameTime gameTime)
         {
-            // Simple TEPORARY collision detection for clicking on the balloon
+            /*
             if ((Mouse.GetState().X > levelModel.Balloons[0].X &&
                 Mouse.GetState().X < (levelModel.Balloons[0].X + levelModel.Balloons[0].Width)) &&
                 (Mouse.GetState().Y > levelModel.Balloons[0].Y &&
                 Mouse.GetState().Y < (levelModel.Balloons[0].Y + levelModel.Balloons[0].Height)))
+            */
+       
+            if (physics.CheckCollision_p_b(levelModel.Player, levelModel.Balloons[0])) 
             {
                 levelModel.Balloons[0].X = new Random().NextInt64(750);
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
 
-                // The ninja can keep moving after popping a balloon
+                levelModel.Score++;
             }
         }
 

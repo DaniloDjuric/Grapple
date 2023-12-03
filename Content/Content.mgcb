@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:balloon.png
 
+#begin galleryFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:galleryFont.spritefont
+
 #begin ninja.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -24,5 +24,16 @@ namespace Grapple.Models
 
         [JsonPropertyName("Speed")]
         public int Speed { get; set; }
+
+        public Vector2 Position
+        {
+            get { return new Vector2(X, Y); }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+            }
+        }
+
     }
 }

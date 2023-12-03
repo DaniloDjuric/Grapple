@@ -22,6 +22,7 @@ namespace Grapple.Models
         public List<PlatformModel> Platforms { get; set; }
         public PlayerModel Player { get; set; }
         public List<BalloonModel> Balloons { get; set; }
+        public int Score { get; set; }
 
         public LevelModel()
         {

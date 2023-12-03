@@ -8,6 +8,7 @@ using Grapple.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Grapple
 {
@@ -22,12 +23,14 @@ namespace Grapple
         Texture2D ninjaSprite;
         Texture2D balloonSprite;
         Texture2D platformSprite;
+        SpriteFont spriteFont;
 
         public LevelView(ContentManager content)
         {
             ninjaSprite = content.Load<Texture2D>("ninja");
             balloonSprite = content.Load<Texture2D>("balloon");
             platformSprite = content.Load<Texture2D>("platform");
+            spriteFont = content.Load<SpriteFont>("galleryFont");
         }
 
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
@@ -59,6 +62,10 @@ namespace Grapple
                 new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
                 new Rectangle(135, 135, 500, 960),
                 Color.DarkGray);
+
+            // Write the score
+            spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
+
         }
     }
 }
