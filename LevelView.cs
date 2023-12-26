@@ -23,13 +23,17 @@ namespace Grapple
         Texture2D ninjaSprite;
         Texture2D balloonSprite;
         Texture2D platformSprite;
+
+        Texture2D UIArt;
         SpriteFont spriteFont;
+        int time = 60;
 
         public LevelView(ContentManager content)
         {
             ninjaSprite = content.Load<Texture2D>("ninja");
             balloonSprite = content.Load<Texture2D>("balloon");
             platformSprite = content.Load<Texture2D>("platform");
+            UIArt = content.Load<Texture2D>("Grapple_Concept_Art");
             spriteFont = content.Load<SpriteFont>("galleryFont");
         }
 
@@ -63,9 +67,20 @@ namespace Grapple
                 new Rectangle(135, 135, 500, 960),
                 Color.DarkGray);
 
-            // Write the score
-            spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
 
+            // UI Write
+            spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
+            spriteBatch.DrawString(spriteFont, $"Time: {time} s", new Vector2(300, 30), Color.White);
+
+            spriteBatch.Draw(UIArt,
+                    new Rectangle(250, 30, 40, 40),
+                    new Rectangle(1720, 1650, 700, 700),
+                    Color.White);
+
+            spriteBatch.Draw(UIArt,
+                    new Rectangle(50, 30, 50, 50),
+                    new Rectangle(2350, 200, 1100, 1100),
+                    Color.White);
         }
     }
 }
