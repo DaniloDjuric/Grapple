@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Grapple.Models;
@@ -29,12 +31,15 @@ namespace Grapple
         {
             contentManager = content;
             levelModel = new LevelModel();
-            levelModel.LoadObjectsFromJson("C:\\Users\\dadal\\source\\repos\\Grapple\\scene.json");
+            //string relativePathToJsonFile = "scene.json";
+            //string projectRootDirectory = content.RootDirectory;
+            //string fullPathToJsonFile = Path.Combine(projectRootDirectory, relativePathToJsonFile);
+            levelModel.LoadObjectsFromJson("C:\\Users\\Korisnik\\source\\repos\\Grapple\\scene.json");
 
             levelView = new LevelView(contentManager);
             levelController = new LevelController(levelModel, levelView);
+            
             //menuController;
-            //shopController;
         }
 
         public void Update(GameTime gameTime)
