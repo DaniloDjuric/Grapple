@@ -44,11 +44,11 @@ namespace Grapple
             //if (TouchPanel.GetState().Count > 0)
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-
-                ChangeTarget(gameTime);
-                //HandleInput();
+                ChangeTarget(gameTime); // Stop using this, don't need a specific target position.
+                //HandleInput(); // Use this instead, calculate the direction and give it to physics. 
             }
-            BalloonCollissionCheck(gameTime);
+            BalloonCollissionCheck(gameTime); 
+            // Should move in a direction until a collision with a wall. Not to a specific position
             physics.MoveTowards(targetPosition, gameTime);            
         }
 

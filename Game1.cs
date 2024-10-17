@@ -5,6 +5,7 @@ using System;
 
 namespace Grapple
 {
+    // Main script. Loads in the controller, initializes and handles beginning and exiting.
     public class Game1 : Game
     {
         private GraphicsDeviceManager graphics;
@@ -31,6 +32,8 @@ namespace Grapple
             gameController = new GameController(Content);
         }
 
+        // Where the controller gets updated. 
+        // Last step is updating the base game.
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -41,14 +44,15 @@ namespace Grapple
             base.Update(gameTime);
         }
 
+        // Where all the visual changes start.
+        // Last step is drawing the base game.
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // SpriteBatch initializing before being passed into the controller, and ending after use.
             spriteBatch.Begin();
-
             gameController.Draw(spriteBatch);
-
             spriteBatch.End();
 
             base.Draw(gameTime);

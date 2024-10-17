@@ -35,15 +35,17 @@ namespace Grapple
             //string projectRootDirectory = content.RootDirectory;
             //string fullPathToJsonFile = Path.Combine(projectRootDirectory, relativePathToJsonFile);
             levelModel.LoadObjectsFromJson("C:\\Users\\Korisnik\\source\\repos\\Grapple\\scene.json");
-
             levelView = new LevelView(contentManager);
+
             levelController = new LevelController(levelModel, levelView);
             
-            //menuController;
+            //menuController = new MenuController(menuModel, menuView);
         }
 
+        // These two are being called from "Game1"
         public void Update(GameTime gameTime)
         {
+            // Logic + menuController.Update();
             levelController.Update(gameTime); 
         }
 
