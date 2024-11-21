@@ -8,8 +8,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Grapple.Models;
 
-namespace Grapple.Models
+namespace Grapple.Level
 {
     /*  Level Model tasks:
      *  - Load in all the elements of the level from a JSON file
@@ -52,7 +53,7 @@ namespace Grapple.Models
                 // Handle other potential exceptions, such as JSON parsing errors
                 throw new Exception($"Error loading objects from JSON file: {jsonFilePath}", ex);
             }
-            
+
         }
 
     }

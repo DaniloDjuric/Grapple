@@ -1,5 +1,4 @@
-﻿using Grapple.Models;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,7 +10,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Grapple
+namespace Grapple.Level
 {
     /*  Level Controller tasks:
      *  - Handle Balloon spawning and other game logic
@@ -44,31 +43,18 @@ namespace Grapple
             //if (TouchPanel.GetState().Count > 0)
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                ChangeTarget(gameTime); // Stop using this, don't need a specific target position.
-                //HandleInput(); // Use this instead, calculate the direction and give it to physics. 
+                ChangeTarget();
             }
-            BalloonCollissionCheck(gameTime); 
+            BalloonCollissionCheck(gameTime);
+
             // Should move in a direction until a collision with a wall. Not to a specific position
-            physics.MoveTowards(targetPosition, gameTime);            
+            Vector2 direction = Vector2.Normalize(targetPosition - levelModel.Player.Position);
+            physics.MoveTowards(direction, gameTime);
         }
 
-        private void HandleInput()
+        // Avoid accidental multi-clicks
+        private void ChangeTarget()
         {
-            Vector2 playerPos = new Vector2(levelModel.Player.X, levelModel.Player.Y);
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                // Calculate the target position using the extended line until it hits a platform
-                Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                targetPosition = physics.CalculateTargetPosition(playerPos, mousePosition);
-            }
-
-            System.Diagnostics.Debug.WriteLine(targetPosition);
-        }
-
-        private void ChangeTarget(GameTime gameTime)
-        {
-            // The ninja can only change his possition 2 times, pop ballons to get more moves
             if (new Vector2(Mouse.GetState().X, Mouse.GetState().Y) != targetPosition)
             {
                 targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
@@ -83,8 +69,8 @@ namespace Grapple
                 (Mouse.GetState().Y > levelModel.Balloons[0].Y &&
                 Mouse.GetState().Y < (levelModel.Balloons[0].Y + levelModel.Balloons[0].Height)))
             */
-       
-            if (physics.CheckCollision_p_b(levelModel.Player, levelModel.Balloons[0])) 
+
+            if (physics.CheckCollision_p_b(levelModel.Balloons[0]))
             {
                 levelModel.Balloons[0].X = new Random().NextInt64(750);
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
@@ -95,7 +81,7 @@ namespace Grapple
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Tells the View to draw the Model
+            // Tells the View to draw, with the atributes (position, size, ...) stored in the Model
             levelView.Draw(spriteBatch, levelModel);
         }
     }

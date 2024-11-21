@@ -1,4 +1,5 @@
-﻿using Grapple.Models;
+﻿using Grapple.Level;
+using Grapple.Models;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,35 +11,32 @@ namespace Grapple
 {
     internal class Physics
     {
-        LevelModel levelModel;
+        LevelModel level;
+        PlayerModel player;
 
-        public Physics(LevelModel level) { 
-            levelModel = level;
+        public Physics(LevelModel levelModel) { 
+            level = levelModel;
+            player = levelModel.Player;
         }
 
-        public void MoveTowards(Vector2 targetPosition, GameTime gameTime)
+        public void MoveTowards(Vector2 direction, GameTime gameTime)
         {
-            // Calculate the direction to the target position
-            Vector2 direction = Vector2.Normalize(targetPosition - levelModel.Player.Position);
+            Vector2 newPosition = player.Position + direction * player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            // Calculate the new position
-            Vector2 newPosition = new Vector2(
-                levelModel.Player.X + direction.X * levelModel.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds,
-                levelModel.Player.Y + direction.Y * levelModel.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds
-            );
-
-            // Update the player's position
-            levelModel.Player.X = newPosition.X;
-            levelModel.Player.Y = newPosition.Y;
+            // If Collision();
+            if(newPosition.X < 1500)
+            {
+                player.Position = newPosition;
+            }
         }
 
-        public bool CheckCollision_p_b(PlayerModel player, BalloonModel balloon)
+        public bool CheckCollision_p_b(BalloonModel balloon)
         {
             // Collision check between player and balloons
-            return player.X+10 < balloon.X + balloon.Width &&
-                   player.X+10 + player.Width > balloon.X &&
-                   player.Y+10 < balloon.Y + balloon.Height &&
-                   player.Y+10 + player.Height > balloon.Y;
+            return player.Position.X+10 < balloon.X + balloon.Width &&
+                   player.Position.X+10 + player.Width > balloon.X &&
+                   player.Position.Y+10 < balloon.Y + balloon.Height &&
+                   player.Position.Y+10 + player.Height > balloon.Y;
         }
 
 
@@ -52,7 +50,7 @@ namespace Grapple
         public Vector2 Raycast(Vector2 startPoint, Vector2 endPoint)
         {
             // Raycasting algorithm to check for intersections with platforms
-            foreach (var platform in levelModel.Platforms)
+            foreach (var platform in level.Platforms)
             {
                 Vector2 intersectionPoint = SegmentIntersectsRectangle(startPoint, endPoint, platform);
 

@@ -4,13 +4,12 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using Grapple.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using static System.Formats.Asn1.AsnWriter;
 
-namespace Grapple
+namespace Grapple.Level
 {
     /*  Level View tasks:
      *  - Load in all the textures and animations
@@ -63,7 +62,7 @@ namespace Grapple
 
             // Draw player
             spriteBatch.Draw(ninjaSprite,
-                new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
+                new Rectangle((int)levelModel.Player.Position.X, (int)levelModel.Player.Position.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
                 new Rectangle(135, 135, 500, 960),
                 Color.DarkGray);
 
