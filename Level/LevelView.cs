@@ -19,21 +19,31 @@ namespace Grapple.Level
 
     internal class LevelView
     {
-        Texture2D ninjaSprite;
+        //Texture2D ninjaSprite;
         Texture2D balloonSprite;
         Texture2D platformSprite;
-
         Texture2D UIArt;
         SpriteFont spriteFont;
+
+        Texture2D ninjaIdle;
+        Texture2D ninjaAttack;
+
         int time = 60;
+
+        private Animation attackAnimation;
+        private Animation flyAnimation;
+        private Animation wallAnimation;
 
         public LevelView(ContentManager content)
         {
-            ninjaSprite = content.Load<Texture2D>("ninja");
+            //ninjaSprite = content.Load<Texture2D>("ninja");
+            ninjaIdle = content.Load<Texture2D>("IDLE");
+            ninjaAttack = content.Load<Texture2D>("ATTACK 1");
             balloonSprite = content.Load<Texture2D>("balloon");
             platformSprite = content.Load<Texture2D>("platform");
             UIArt = content.Load<Texture2D>("Grapple_Concept_Art");
             spriteFont = content.Load<SpriteFont>("galleryFont");
+            attackAnimation = new(ninjaAttack, 7, 0.1f);
         }
 
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
@@ -60,12 +70,17 @@ namespace Grapple.Level
                     Color.Lime);
             }
 
+
             // Draw player
+            attackAnimation.Update();
+            attackAnimation.Draw(levelModel.Player.Position, spriteBatch);
+            
+            /*
             spriteBatch.Draw(ninjaSprite,
-                new Rectangle((int)levelModel.Player.Position.X, (int)levelModel.Player.Position.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
+            new Rectangle((int)levelModel.Player.Position.X, (int)levelModel.Player.Position.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
                 new Rectangle(135, 135, 500, 960),
                 Color.DarkGray);
-
+            */
 
             // UI Write
             spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
