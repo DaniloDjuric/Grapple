@@ -19,16 +19,15 @@ namespace Grapple.Level
 
     internal class LevelView
     {
-        //Texture2D ninjaSprite;
+        UIRenderer uiRenderer;
+
         Texture2D balloonSprite;
         Texture2D platformSprite;
-        Texture2D UIArt;
-        SpriteFont spriteFont;
 
         Texture2D ninjaIdle;
         Texture2D ninjaAttack;
 
-        int time = 60;
+        float time = 60000;
 
         private Animation attackAnimation;
         private Animation flyAnimation;
@@ -36,16 +35,20 @@ namespace Grapple.Level
 
         public LevelView(ContentManager content)
         {
-            //ninjaSprite = content.Load<Texture2D>("ninja");
+            uiRenderer = new UIRenderer(content);
+
             ninjaIdle = content.Load<Texture2D>("IDLE");
             ninjaAttack = content.Load<Texture2D>("ATTACK 1");
             balloonSprite = content.Load<Texture2D>("balloon");
             platformSprite = content.Load<Texture2D>("platform");
-            UIArt = content.Load<Texture2D>("Grapple_Concept_Art");
-            spriteFont = content.Load<SpriteFont>("galleryFont");
+
+            flyAnimation = new(ninjaIdle, 10, 0.1f);
             attackAnimation = new(ninjaAttack, 7, 0.1f);
         }
 
+        public void Update(GameTime gametime) {
+            time -= (float)gametime.ElapsedGameTime.TotalMilliseconds;
+        }
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
         {
 
@@ -70,31 +73,12 @@ namespace Grapple.Level
                     Color.Lime);
             }
 
-
             // Draw player
             attackAnimation.Update();
             attackAnimation.Draw(levelModel.Player.Position, spriteBatch);
-            
-            /*
-            spriteBatch.Draw(ninjaSprite,
-            new Rectangle((int)levelModel.Player.Position.X, (int)levelModel.Player.Position.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height),
-                new Rectangle(135, 135, 500, 960),
-                Color.DarkGray);
-            */
 
-            // UI Write
-            spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
-            spriteBatch.DrawString(spriteFont, $"Time: {time} s", new Vector2(300, 30), Color.White);
-
-            spriteBatch.Draw(UIArt,
-                    new Rectangle(250, 30, 40, 40),
-                    new Rectangle(1720, 1650, 700, 700),
-                    Color.White);
-
-            spriteBatch.Draw(UIArt,
-                    new Rectangle(50, 30, 50, 50),
-                    new Rectangle(2350, 200, 1100, 1100),
-                    Color.White);
+            // 
+            uiRenderer.Draw(spriteBatch, time, levelModel);
         }
     }
 }

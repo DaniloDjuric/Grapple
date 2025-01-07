@@ -50,6 +50,8 @@ namespace Grapple.Level
             // Should move in a direction until a collision with a wall. Not to a specific position
             Vector2 direction = Vector2.Normalize(targetPosition - levelModel.Player.Position);
             physics.MoveTowards(direction, gameTime);
+
+            levelView.Update(gameTime);
         }
 
         // Avoid accidental multi-clicks
