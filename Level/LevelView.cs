@@ -20,6 +20,8 @@ namespace Grapple.Level
     internal class LevelView
     {
         UIRenderer uiRenderer;
+        MenuRenderer menuRenderer;
+        LeaderboardRenderer leaderboardRenderer;
 
         Texture2D balloonSprite;
         Texture2D platformSprite;
@@ -27,7 +29,9 @@ namespace Grapple.Level
         Texture2D ninjaIdle;
         Texture2D ninjaAttack;
 
-        float time = 60000;
+        public static float time = 60000;
+        public static bool paused = false;
+        public static bool leaderboard = false;
 
         private Animation attackAnimation;
         private Animation flyAnimation;
@@ -36,6 +40,8 @@ namespace Grapple.Level
         public LevelView(ContentManager content)
         {
             uiRenderer = new UIRenderer(content);
+            menuRenderer = new MenuRenderer(content);
+            leaderboardRenderer = new LeaderboardRenderer(content);
 
             ninjaIdle = content.Load<Texture2D>("IDLE");
             ninjaAttack = content.Load<Texture2D>("ATTACK 1");
@@ -47,38 +53,48 @@ namespace Grapple.Level
         }
 
         public void Update(GameTime gametime) {
-            time -= (float)gametime.ElapsedGameTime.TotalMilliseconds;
+            if (!paused)
+            {
+                time -= (float)gametime.ElapsedGameTime.TotalMilliseconds;
+            }
         }
         public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
         {
-
-            // Dictionary {objectType ; Sprite}
-            // objectType: Player, Platform, Baloon
-            // Sprite(new script) +texture +crop +color;
-
-            // Draw platforms
-            foreach (var platform in levelModel.Platforms)
+            if (!paused)
             {
-                spriteBatch.Draw(platformSprite,
-                    new Rectangle((int)platform.X, (int)platform.Y, (int)platform.Width, (int)platform.Height),
-                    new Rectangle(130, 70, 170, 800),
-                    Color.White);
-            }
 
-            // Draw balloons
-            foreach (var enemy in levelModel.Balloons)
+                // Draw platforms
+                foreach (var platform in levelModel.Platforms)
+                {
+                    spriteBatch.Draw(platformSprite,
+                        new Rectangle((int)platform.X, (int)platform.Y, (int)platform.Width, (int)platform.Height),
+                        new Rectangle(130, 70, 170, 800),
+                        Color.White);
+                }
+
+                // Draw balloons
+                foreach (var enemy in levelModel.Balloons)
+                {
+                    spriteBatch.Draw(balloonSprite,
+                        new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height),
+                        Color.Lime);
+                }
+
+                // Draw player
+                attackAnimation.Update();
+                attackAnimation.Draw(levelModel.Player.Position, spriteBatch);
+
+                // 
+                uiRenderer.Draw(spriteBatch, time, levelModel);
+            }
+            else if (!leaderboard && paused)
             {
-                spriteBatch.Draw(balloonSprite,
-                    new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height),
-                    Color.Lime);
+                menuRenderer.Draw(spriteBatch);
             }
-
-            // Draw player
-            attackAnimation.Update();
-            attackAnimation.Draw(levelModel.Player.Position, spriteBatch);
-
-            // 
-            uiRenderer.Draw(spriteBatch, time, levelModel);
+            else if (leaderboard && paused)
+            {
+                leaderboardRenderer.Draw(spriteBatch);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Grapple.Level;
 
 namespace Grapple
 {
@@ -16,15 +17,28 @@ namespace Grapple
         private Texture2D Texture;
         private readonly string Name;
         private Color Color;
-        
+        private MouseState previousMouseState;
+
+        public Button(string name, int width, int height, int buttonX, int buttonY)
+        {
+            this.Name = name;
+            this.ButtonX = buttonX;
+            this.ButtonY = buttonY;
+            this.Rect = new(buttonX, buttonY, width, height);
+            this.Color = Color.CornflowerBlue;
+
+            previousMouseState = Mouse.GetState();
+        }
         public Button(string name, Texture2D texture, int buttonX, int buttonY)
         {
             this.Name = name;
             this.Texture = texture;
             this.ButtonX = buttonX;
             this.ButtonY = buttonY;
-            this.Rect = new(buttonX, buttonY, texture.Width, texture.Height);
-            this.Color = Color.CornflowerBlue;
+            this.Rect = new(buttonX, buttonY, (int)Math.Round(texture.Width* 0.05), (int)Math.Round(texture.Height * 0.05));
+            this.Color = Color.Black;
+
+            previousMouseState = Mouse.GetState();
         }
 
         /**
@@ -37,33 +51,55 @@ namespace Grapple
 
             if (cursor.Intersects(Rect))
             {
-                this.Color = Color.DarkRed;
+                this.Color = Color.LightGray;
                 return true;
             }
             else
             {
-                this.Color = Color.CornflowerBlue;
+                this.Color = Color.Black;
                 return false;
             }
         }
 
         public void Update()
         {
-            if (enterButton() && Mouse.GetState().LeftButton == ButtonState.Released && Mouse.GetState().LeftButton == ButtonState.Pressed)
+            MouseState currentMouseState = Mouse.GetState();
+
+            if (enterButton() && previousMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
             {
                 switch (Name)
                 {
                     case "pause":
-                        // Code for the pause screen
+                        LevelView.paused = !LevelView.paused;
+                        LevelView.leaderboard = false;
+                        break;
+                    case "Restart level":
+                        LevelView.paused = false;
+                        LevelView.time = 60000;
+                        LevelModel.Score = 0;
+                        break;
+                    case "Leaderboard":
+                        LevelView.leaderboard = true;
                         break;
                     default:
+                        // Remove after testing
+
                         break;
                 }
             }
+
+            previousMouseState = currentMouseState;
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont)
         {
-            spriteBatch.Draw(Texture, new Vector2(ButtonX, ButtonY), new Rectangle(0, 0, Texture.Width, Texture.Height), this.Color, 0f, new Vector2(), new Vector2(0.05f, 0.05f), new SpriteEffects(), 0f);
+            if (Texture != null)
+            {  
+                spriteBatch.Draw(Texture, new Vector2(ButtonX, ButtonY), new Rectangle(0, 0, Texture.Width, Texture.Height), this.Color, 0f, new Vector2(), new Vector2(0.05f, 0.05f), new SpriteEffects(), 0f);
+            }
+            else
+            {
+                spriteBatch.DrawString(spriteFont, Name, new Vector2(ButtonX, ButtonY), this.Color);
+            }
         }
     }
 }

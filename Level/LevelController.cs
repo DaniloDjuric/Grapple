@@ -77,7 +77,7 @@ namespace Grapple.Level
                 levelModel.Balloons[0].X = new Random().NextInt64(750);
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
 
-                levelModel.Score++;
+                LevelModel.Score++;
             }
         }
 

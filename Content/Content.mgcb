@@ -188,6 +188,18 @@
 /processorParam:TextureFormat=Color
 /build:IDLE.png
 
+#begin imageedit_1_3877078789.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:imageedit_1_3877078789.png;Leaderboard.png
+
 #begin JUMP-FALL.png
 /importer:TextureImporter
 /processor:TextureProcessor

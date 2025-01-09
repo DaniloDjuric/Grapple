@@ -32,7 +32,7 @@ namespace Grapple
         {
 
             // UI Write
-            spriteBatch.DrawString(spriteFont, $"Score: {levelModel.Score}", new Vector2(100, 30), Color.White);
+            spriteBatch.DrawString(spriteFont, $"Score: {LevelModel.Score}", new Vector2(100, 30), Color.White);
             spriteBatch.DrawString(spriteFont, $"Time: {(time / 1000).ToString("0.00")} s", new Vector2(300, 30), Color.White);
             spriteBatch.Draw(UIArt,
                     new Rectangle(250, 30, 40, 40),
@@ -45,7 +45,7 @@ namespace Grapple
                     Color.White);
 
             pauseButton.Update();
-            pauseButton.Draw(spriteBatch);
+            pauseButton.Draw(spriteBatch, spriteFont);
         }
     }
 }
