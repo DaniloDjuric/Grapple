@@ -1,3 +1,3 @@
 ﻿
-using var game = new Grapple.Game1();
+using var game = new Grapple.Main();
 game.Run();

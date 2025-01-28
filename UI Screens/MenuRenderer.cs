@@ -24,16 +24,14 @@ namespace Grapple
         Texture2D pauseButtonTexture;
         Texture2D leaderBoardTexture;
         Texture2D UIArt;
-        SpriteFont spriteFont;
 
-        public MenuRenderer(ContentManager content)
+        public MenuRenderer()
         {
-            leaderBoardTexture = content.Load<Texture2D>("Leaderboard");
-            pauseButtonTexture = content.Load<Texture2D>("pause_button");
-            UIArt = content.Load<Texture2D>("Grapple_Concept_Art");
-            spriteFont = content.Load<SpriteFont>("galleryFont");
+            leaderBoardTexture = Globals.Content.Load<Texture2D>("Leaderboard");
+            pauseButtonTexture = Globals.Content.Load<Texture2D>("pause_button");
+            UIArt = Globals.Content.Load<Texture2D>("Grapple_Concept_Art");
             
-            pauseButton = new Button("pause", pauseButtonTexture, 700, 35);
+            pauseButton = new Button("Pause", pauseButtonTexture, 700, 35);
             restartButton = new Button("Restart level", 200, 50, 100, 200);
             lelevSelectButton = new Button("Select Level", 200, 50, 100, 250);
             settingsButton = new Button("Settings", 150, 50, 100, 300);
@@ -41,26 +39,20 @@ namespace Grapple
             leaderBoardButton = new Button("Leaderboard", leaderBoardTexture, 500, 200);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw()
         {
+            SpriteFont SpriteFont = Globals.Content.Load<SpriteFont>("galleryFont");
 
             // UI Write
-            spriteBatch.DrawString(spriteFont, "Paused", new Vector2(100, 150), Color.White);
-            spriteBatch.DrawString(spriteFont, "Leaderboard", new Vector2(440, 250), Color.Black);
+            Globals.SpriteBatch.DrawString(SpriteFont, "Paused", new Vector2(100, 150), Color.White);
+            Globals.SpriteBatch.DrawString(SpriteFont, "Leaderboard", new Vector2(440, 250), Color.Black);
 
-            pauseButton.Update();
-            pauseButton.Draw(spriteBatch, spriteFont);
-
-            lelevSelectButton.Update();
-            lelevSelectButton.Draw(spriteBatch, spriteFont);
-            settingsButton.Update();
-            settingsButton.Draw(spriteBatch, spriteFont);
-            quitButton.Update();
-            quitButton.Draw(spriteBatch, spriteFont);
-            restartButton.Update();
-            restartButton.Draw(spriteBatch, spriteFont);
-            leaderBoardButton.Update();
-            leaderBoardButton.Draw(spriteBatch, spriteFont);
+            pauseButton.Display();
+            lelevSelectButton.Display();
+            settingsButton.Display();
+            quitButton.Display();
+            restartButton.Display();
+            leaderBoardButton.Display();
         }
     }
 }

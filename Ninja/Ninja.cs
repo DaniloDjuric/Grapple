@@ -34,7 +34,7 @@ namespace Grapple.Ninja
 
         public void Draw()
         {
-            animation.Draw(position, spriteBatch);
+            animation.Draw(position);
         }
     }
 }

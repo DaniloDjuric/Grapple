@@ -23,26 +23,22 @@ namespace Grapple
     internal class GameController
     {
         private LevelController levelController;
-        private ContentManager contentManager;
         private LevelModel levelModel;
         private LevelView levelView;
 
         public GameController(ContentManager content)
         {
-            contentManager = content;
             levelModel = new LevelModel();
-            //string relativePathToJsonFile = "scene.json";
-            //string projectRootDirectory = content.RootDirectory;
-            //string fullPathToJsonFile = Path.Combine(projectRootDirectory, relativePathToJsonFile);
-            levelModel.LoadObjectsFromJson("C:\\Users\\Korisnik\\source\\repos\\Grapple\\scene.json");
-            levelView = new LevelView(contentManager);
-
+            levelModel.LoadObjectsFromJson("..\\..\\..\\scene.json");
+            levelView = new LevelView();
             levelController = new LevelController(levelModel, levelView);
             
+            Physics.levelModel = levelModel;
+
             //menuController = new MenuController(menuModel, menuView);
         }
 
-        // These two are being called from "Game1"
+        // These two are being called from "Main"
         public void Update(GameTime gameTime)
         {
             // Logic + menuController.Update();
@@ -53,7 +49,7 @@ namespace Grapple
         {
             // Later this can call "MenuController.Draw" when I have a Menu
             // and have logic for knowing what scene should be drawn
-            levelController.Draw(spriteBatch);
+            levelController.Draw();
         }
     }
 

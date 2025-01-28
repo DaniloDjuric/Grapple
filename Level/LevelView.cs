@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace Grapple.Level
@@ -37,16 +40,16 @@ namespace Grapple.Level
         private Animation flyAnimation;
         private Animation wallAnimation;
 
-        public LevelView(ContentManager content)
+        public LevelView()
         {
-            uiRenderer = new UIRenderer(content);
-            menuRenderer = new MenuRenderer(content);
-            leaderboardRenderer = new LeaderboardRenderer(content);
+            uiRenderer = new UIRenderer();
+            menuRenderer = new MenuRenderer();
+            leaderboardRenderer = new LeaderboardRenderer();
 
-            ninjaIdle = content.Load<Texture2D>("IDLE");
-            ninjaAttack = content.Load<Texture2D>("ATTACK 1");
-            balloonSprite = content.Load<Texture2D>("balloon");
-            platformSprite = content.Load<Texture2D>("platform");
+            ninjaIdle = Globals.Content.Load<Texture2D>("IDLE");
+            ninjaAttack = Globals.Content.Load<Texture2D>("ATTACK 1");
+            balloonSprite = Globals.Content.Load<Texture2D>("balloon");
+            platformSprite = Globals.Content.Load<Texture2D>("platform");
 
             flyAnimation = new(ninjaIdle, 10, 0.1f);
             attackAnimation = new(ninjaAttack, 7, 0.1f);
@@ -55,18 +58,22 @@ namespace Grapple.Level
         public void Update(GameTime gametime) {
             if (!paused)
             {
-                time -= (float)gametime.ElapsedGameTime.TotalMilliseconds;
+                time -= Globals.TotalSeconds*1000; // Convert to miliseconds for better precission
             }
         }
-        public void Draw(SpriteBatch spriteBatch, LevelModel levelModel)
+        public void Draw(LevelModel levelModel)
         {
+            if (time <= 0)
+            {
+                Globals.GameRunning = false;
+            }
+
             if (!paused)
             {
-
                 // Draw platforms
                 foreach (var platform in levelModel.Platforms)
                 {
-                    spriteBatch.Draw(platformSprite,
+                    Globals.SpriteBatch.Draw(platformSprite,
                         new Rectangle((int)platform.X, (int)platform.Y, (int)platform.Width, (int)platform.Height),
                         new Rectangle(130, 70, 170, 800),
                         Color.White);
@@ -75,25 +82,34 @@ namespace Grapple.Level
                 // Draw balloons
                 foreach (var enemy in levelModel.Balloons)
                 {
-                    spriteBatch.Draw(balloonSprite,
+                    Globals.SpriteBatch.Draw(balloonSprite,
                         new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height),
                         Color.Lime);
+
+                    // Baloon hitbox - debug
+                    //Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height), Color.DarkRed);
                 }
 
                 // Draw player
-                attackAnimation.Update();
-                attackAnimation.Draw(levelModel.Player.Position, spriteBatch);
+                flyAnimation.Update();
+                flyAnimation.Draw(levelModel.Player.Position);
 
-                // 
-                uiRenderer.Draw(spriteBatch, time, levelModel);
+                // Player hitbox - debug
+                //Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height), Color.Green);
+
+                // Grapple
+                //Globals.DrawLine(Globals.SpriteBatch, levelModel.Player.Position, Physics.CalculateTargetPosition(levelModel.Player.Position, Mouse.GetState().Position.ToVector2()), Color.Black, 3);
+
+                // UI  
+                uiRenderer.Draw(time);
             }
             else if (!leaderboard && paused)
             {
-                menuRenderer.Draw(spriteBatch);
+                menuRenderer.Draw();
             }
             else if (leaderboard && paused)
             {
-                leaderboardRenderer.Draw(spriteBatch);
+                leaderboardRenderer.Draw();
             }
         }
     }

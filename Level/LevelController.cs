@@ -1,14 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Grapple.Level
 {
@@ -22,17 +27,30 @@ namespace Grapple.Level
     {
         private LevelModel levelModel;
         private LevelView levelView;
-        private Physics physics;
 
+        private SoundEffect popSoundEffect;
+        private float popSoundVolume = 0.6f;
+        private Song mainSong;
+
+        private bool Moving = false;
+        private Vector2 clickPosition;
         private Vector2 targetPosition;
-        //private int inputsAllowed = 3;
-        //private int inputsLeft = 2;
+        private int clickCounter; 
+        private int totalClicksAllowed = 1; 
+
 
         public LevelController(LevelModel model, LevelView view)
         {
             levelModel = model;
             levelView = view;
-            physics = new Physics(levelModel);
+
+            popSoundEffect = Globals.Content.Load<SoundEffect>(@"Sounds\\pop-sound");
+            mainSong = Globals.Content.Load<Song>(@"Sounds\\main-song");
+
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Volume = 0.2f;
+            MediaPlayer.Play(mainSong);
+
         }
 
         // TouchPanel.GetState();    =>      For mobile funcionality
@@ -40,16 +58,28 @@ namespace Grapple.Level
 
         public void Update(GameTime gameTime)
         {
-            //if (TouchPanel.GetState().Count > 0)
+        
+            if (LevelView.paused) MediaPlayer.Volume = 0.05f;
+            else MediaPlayer.Volume = 0.2f;
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 ChangeTarget();
             }
             BalloonCollissionCheck(gameTime);
 
-            // Should move in a direction until a collision with a wall. Not to a specific position
-            Vector2 direction = Vector2.Normalize(targetPosition - levelModel.Player.Position);
-            physics.MoveTowards(direction, gameTime);
+            Physics.MoveTowards(targetPosition, gameTime, ref Moving, levelModel.Player);
+
+            if (!Moving)
+            {
+                clickCounter = totalClicksAllowed;
+            }
+
+            if (!Globals.GameRunning && Globals.HighScoreManager.scoresUpdated == false)
+            {
+                Globals.HighScoreManager.UpdateHighScores("Danilo", LevelModel.Score);
+                Globals.HighScoreManager.scoresUpdated = true;
+            }
 
             levelView.Update(gameTime);
         }
@@ -57,34 +87,49 @@ namespace Grapple.Level
         // Avoid accidental multi-clicks
         private void ChangeTarget()
         {
-            if (new Vector2(Mouse.GetState().X, Mouse.GetState().Y) != targetPosition)
+            if (!Globals.GameRunning) return;
+
+            if (clickCounter <= 0) return;
+
+            Vector2 newClickPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+
+            if (newClickPosition != clickPosition)
             {
-                targetPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                clickPosition = newClickPosition;
+                Vector2 calculatedTarget = Physics.CalculateTargetPosition(levelModel.Player.Center, clickPosition);
+                if (calculatedTarget != Vector2.Zero)
+                {
+                    targetPosition = calculatedTarget;
+                    clickCounter--; // Decrement clicks
+                    Moving = true; // Enable movement
+                }
+                else
+                {
+                    Debug.WriteLine("Invalid target position calculated");
+                }
             }
         }
 
         private void BalloonCollissionCheck(GameTime gameTime)
         {
-            /*
-            if ((Mouse.GetState().X > levelModel.Balloons[0].X &&
-                Mouse.GetState().X < (levelModel.Balloons[0].X + levelModel.Balloons[0].Width)) &&
-                (Mouse.GetState().Y > levelModel.Balloons[0].Y &&
-                Mouse.GetState().Y < (levelModel.Balloons[0].Y + levelModel.Balloons[0].Height)))
-            */
-
-            if (physics.CheckCollision_p_b(levelModel.Balloons[0]))
+            if (Physics.CheckCollision_p_b(levelModel.Balloons[0]))
             {
                 levelModel.Balloons[0].X = new Random().NextInt64(750);
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
 
+
+                popSoundEffect.Play();
                 LevelModel.Score++;
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw()
         {
             // Tells the View to draw, with the atributes (position, size, ...) stored in the Model
-            levelView.Draw(spriteBatch, levelModel);
+            levelView.Draw(levelModel);
+
+            Globals.DrawLine(Globals.SpriteBatch, levelModel.Player.Center, Physics.CalculateTargetPosition(levelModel.Player.Center, targetPosition), Color.Black, 3);
+
         }
     }
 

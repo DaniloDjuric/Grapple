@@ -25,6 +25,11 @@ namespace Grapple.Models
         [JsonPropertyName("Speed")]
         public int Speed { get; set; }
 
+        public Vector2 Center
+        {
+            get { return new Vector2(X+40, Y+50); }
+        }
+
         // Conbines the position into a Vector2 for easier calculations and use
         public Vector2 Position
         {

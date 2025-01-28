@@ -17,8 +17,6 @@ namespace Grapple
         private readonly Texture2D _texture;
         private readonly List<Rectangle> _sourceRectangles = new();
 
-        private GameTime gameTime;
-
         public int _totalFrames;
         public int _frame;
         public float _frameTime;
@@ -30,22 +28,20 @@ namespace Grapple
             _frameTime = frameTime;
             _frameTimeLeft = _frameTime;
             _totalFrames = framesX;
-            gameTime = new GameTime();
 
             var frameWidth = (_texture.Width / framesX);
             var frameHeight = _texture.Height;
 
             for (int i = 0; i < _totalFrames; i++)
             {
-                _sourceRectangles.Add(new Rectangle(i * frameWidth + 30, 30, frameWidth - 30, frameHeight - 30));
+                _sourceRectangles.Add(new Rectangle(i * frameWidth + 35, 45, frameWidth - 30, frameHeight - 30));
             }
         }
 
 
         public void Update()
         {
-            float ellapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            _frameTimeLeft -= 0.02f; ;
+            _frameTimeLeft -= Globals.TotalSeconds;
 
             if (_frameTimeLeft <= 0) {
                 _frameTimeLeft += _frameTime;
@@ -55,9 +51,9 @@ namespace Grapple
         }
 
 
-        public void Draw(Vector2 pos, SpriteBatch spriteBatch)
+        public void Draw(Vector2 pos)
         {
-            spriteBatch.Draw(_texture, pos, _sourceRectangles[_frame], Color.White, 0f, new Vector2(), new Vector2(2, 2), new SpriteEffects(), 0f) ;
+            Globals.SpriteBatch.Draw(_texture, pos, _sourceRectangles[_frame], Color.White, 0f, new Vector2(), new Vector2(2.5f, 2.5f), new SpriteEffects(), 0f) ;
         }
     }
 }

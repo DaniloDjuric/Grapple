@@ -1,134 +1,139 @@
 ﻿using Grapple.Level;
 using Grapple.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Grapple
 {
-    internal class Physics
-    {
-        LevelModel level;
-        PlayerModel player;
+    internal static class Physics
+    { 
+        public static LevelModel levelModel { get; set; }
 
-        public Physics(LevelModel levelModel) { 
-            level = levelModel;
-            player = levelModel.Player;
-        }
-
-        public void MoveTowards(Vector2 direction, GameTime gameTime)
+        public static void MoveTowards(Vector2 targetPosition, GameTime gameTime, ref bool Moving, PlayerModel player)
         {
+            if (!Moving) return; // Skip movement if not moving
+
+            Vector2 direction = Vector2.Normalize(targetPosition - player.Position);
             Vector2 newPosition = player.Position + direction * player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
-            // If Collision();
-            if(newPosition.X < 1500)
+
+            // Add clamping to stop overshooting
+            if (Vector2.Distance(newPosition, targetPosition) < Vector2.Distance(player.Position, newPosition))
+            {
+                Debug.Write("Overshoot-snappign\n");
+                newPosition = targetPosition; // Snap to the target
+                Moving = false; // Stop movement
+            }
+
+            // Check if the player has reached the target (accounting for size)
+            // Adjust the player's position to prevent snapping outside the playable area
+            if (HasReachedTarget(newPosition, targetPosition, player))
+            {
+                Vector2 adjustedPosition = GetSnappedPosition(targetPosition, player);
+                player.Position = adjustedPosition; // Snap adjusted position
+                Moving = false; // Stop moving
+            }
+            else
             {
                 player.Position = newPosition;
             }
         }
 
-        public bool CheckCollision_p_b(BalloonModel balloon)
+        private static Vector2 GetSnappedPosition(Vector2 targetPosition, PlayerModel player)
+        {
+            float adjustedX = targetPosition.X;
+            float adjustedY = targetPosition.Y;
+
+            // Check if colliding with a wall on the right or bottom side
+            if (targetPosition.X + player.Width > Globals.PlayableArea.Width)
+                adjustedX = Globals.PlayableArea.Width - player.Width;
+
+            if (targetPosition.Y + player.Height > Globals.PlayableArea.Height)
+                adjustedY = Globals.PlayableArea.Height - player.Height;
+
+            // Check if colliding with a wall on the left or top side
+            if (targetPosition.X < Globals.PlayableArea.X)
+                adjustedX = Globals.PlayableArea.X;
+
+            if (targetPosition.Y < Globals.PlayableArea.Y)
+                adjustedY = Globals.PlayableArea.Y;
+
+            return new Vector2(adjustedX, adjustedY);
+        }
+
+        public static Vector2 GetAdjustedTargetPosition(Vector2 targetPosition, float playerWidth, float playerHeight)
+        {
+            float adjustedX = Math.Clamp(targetPosition.X, 0, Globals.PlayableArea.Width - playerWidth);
+            float adjustedY = Math.Clamp(targetPosition.Y, 0, Globals.PlayableArea.Height - playerHeight);
+
+            return new Vector2(adjustedX, adjustedY);
+        }
+
+        private static bool HasReachedTarget(Vector2 newPosition, Vector2 targetPosition, PlayerModel player)
+        {
+            // Define the player's bounding box
+            Globals.RectangleF playerBounds = new Globals.RectangleF(newPosition.X, newPosition.Y, player.Width, player.Height);
+
+            // Create a small rectangle around the target position
+            float targetTolerance = 1f; // Small tolerance to ensure precision
+            Globals.RectangleF targetBounds = new Globals.RectangleF(
+                targetPosition.X - targetTolerance,
+                targetPosition.Y - targetTolerance,
+                targetTolerance,
+                targetTolerance
+            );
+
+            // Check for intersection
+            return playerBounds.IntersectsWith(targetBounds);
+        }
+
+        public static bool CheckCollision_p_b(BalloonModel balloon)
         {
             // Collision check between player and balloons
-            return player.Position.X+10 < balloon.X + balloon.Width &&
-                   player.Position.X+10 + player.Width > balloon.X &&
-                   player.Position.Y+10 < balloon.Y + balloon.Height &&
-                   player.Position.Y+10 + player.Height > balloon.Y;
+            return levelModel.Player.Position.X < balloon.X + balloon.Width &&
+                   levelModel.Player.Position.X + levelModel.Player.Width > balloon.X &&
+                   levelModel.Player.Position.Y < balloon.Y + balloon.Height &&
+                   levelModel.Player.Position.Y + levelModel.Player.Height > balloon.Y;
         }
 
-
-        public Vector2 CalculateTargetPosition(Vector2 startPoint, Vector2 endPoint)
+        public static Vector2 CalculateTargetPosition(Vector2 startPoint, Vector2 direction)
         {
-            // Calculate the extended line until it hits a platform
-            Vector2 intersectionPoint = Raycast(startPoint, endPoint);
-            return intersectionPoint;
-        }
-
-        public Vector2 Raycast(Vector2 startPoint, Vector2 endPoint)
-        {
-            // Raycasting algorithm to check for intersections with platforms
-            foreach (var platform in level.Platforms)
-            {
-                Vector2 intersectionPoint = SegmentIntersectsRectangle(startPoint, endPoint, platform);
-
-                if (intersectionPoint != Vector2.Zero)
-                {
-                    // Return the intersection point
-                    return intersectionPoint;
-                }
-
-            }
-            return endPoint;
-        }
-
-        private Vector2 SegmentIntersectsRectangle(Vector2 startPoint, Vector2 endPoint, PlatformModel platform)
-        {
-            // Check if the line segment intersects with the rectangle
-            float left = Math.Min(platform.X, platform.X + platform.Width);
-            float right = Math.Max(platform.X, platform.X + platform.Width);
-            float top = Math.Min(platform.Y, platform.Y + platform.Height);
-            float bottom = Math.Max(platform.Y, platform.Y + platform.Height);
-
-            if (LineIntersectsRectangle(startPoint, endPoint, platform))
-            {
-                // Return the intersection point
-                return GetIntersectionPoint(startPoint, endPoint, platform);
-            }
-
-            // If no intersection, return zero vector
-            return Vector2.Zero;
-        }
-
-        private bool LineIntersectsLine(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
-        {
-            // Check if two lines intersect
-            float cross1 = (p4.Y - p3.Y) * (p2.X - p1.X) - (p4.X - p3.X) * (p2.Y - p1.Y);
-            float cross2 = (p2.Y - p1.Y) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Y - p1.Y);
-
-            float t1 = cross1 / (p2 - p1).LengthSquared();
-            float t2 = cross2 / (p4 - p3).LengthSquared();
-
-            return (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1);
-        }
-
-        private bool LineIntersectsRectangle(Vector2 startPoint, Vector2 endPoint, PlatformModel platform)
-        {
-            // Check if the line intersects with any of the sides of the rectangle
-            return LineIntersectsLine(startPoint, endPoint, new Vector2(platform.X, platform.Y), new Vector2(platform.X + platform.Width, platform.Y)) || // Top side
-                   LineIntersectsLine(startPoint, endPoint, new Vector2(platform.X + platform.Width, platform.Y), new Vector2(platform.X + platform.Width, platform.Y + platform.Height)) || // Right side
-                   LineIntersectsLine(startPoint, endPoint, new Vector2(platform.X, platform.Y + platform.Height), new Vector2(platform.X + platform.Width, platform.Y + platform.Height)) || // Bottom side
-                   LineIntersectsLine(startPoint, endPoint, new Vector2(platform.X, platform.Y), new Vector2(platform.X, platform.Y + platform.Height)); // Left side
-        }
-
-        private Vector2 GetIntersectionPoint(Vector2 startPoint, Vector2 endPoint, PlatformModel platform)
-        {
-            // Calculate the direction vector of the line segment
-            Vector2 direction = endPoint - startPoint;
-
-            // Calculate the intersection points with each side of the rectangle
-            Vector2[] intersections = new Vector2[4];
-
-            intersections[0] = LineIntersection(startPoint, direction, new Vector2(platform.X, platform.Y), new Vector2(platform.X + platform.Width, platform.Y)); // Top side
-            intersections[1] = LineIntersection(startPoint, direction, new Vector2(platform.X + platform.Width, platform.Y), new Vector2(platform.X + platform.Width, platform.Y + platform.Height)); // Right side
-            intersections[2] = LineIntersection(startPoint, direction, new Vector2(platform.X, platform.Y + platform.Height), new Vector2(platform.X + platform.Width, platform.Y + platform.Height)); // Bottom side
-            intersections[3] = LineIntersection(startPoint, direction, new Vector2(platform.X, platform.Y), new Vector2(platform.X, platform.Y + platform.Height)); // Left side
-
-            // Find the closest intersection point
+            Vector2 rayDirection = Vector2.Normalize(direction - startPoint); // Direction of the ray
             Vector2 closestIntersection = Vector2.Zero;
             float closestDistance = float.MaxValue;
 
-            foreach (var intersection in intersections)
+            // Iterate through all platforms to find the closest intersection point
+            foreach (var platform in levelModel.Platforms)
             {
-                if (intersection != Vector2.Zero)
+                // Define rectangle edges as line segments
+                Vector2 topLeft = new Vector2(platform.X, platform.Y);
+                Vector2 topRight = new Vector2(platform.X + platform.Width, platform.Y);
+                Vector2 bottomLeft = new Vector2(platform.X, platform.Y + platform.Height);
+                Vector2 bottomRight = new Vector2(platform.X + platform.Width, platform.Y + platform.Height);
+
+                Vector2[] edges = new Vector2[]
                 {
-                    float distance = Vector2.Distance(startPoint, intersection);
-                    if (distance < closestDistance)
+                    LineIntersection(startPoint, rayDirection, topLeft, topRight), // Top
+                    LineIntersection(startPoint, rayDirection, topRight, bottomRight), // Right
+                    LineIntersection(startPoint, rayDirection, bottomLeft, bottomRight), // Bottom
+                    LineIntersection(startPoint, rayDirection, topLeft, bottomLeft) // Left
+                };
+
+                foreach (var intersection in edges)
+                {
+                    if (intersection != Vector2.Zero) // If there's a valid intersection
                     {
-                        closestIntersection = intersection;
-                        closestDistance = distance;
+                        float distance = Vector2.Distance(startPoint, intersection);
+                        if (distance < closestDistance)
+                        {
+                            closestIntersection = intersection;
+                            closestDistance = distance;
+                        }
                     }
                 }
             }
@@ -136,20 +141,31 @@ namespace Grapple
             return closestIntersection;
         }
 
-        private Vector2 LineIntersection(Vector2 p1, Vector2 v1, Vector2 p2, Vector2 v2)
+        private static Vector2 LineIntersection(Vector2 rayOrigin, Vector2 rayDirection, Vector2 segmentStart, Vector2 segmentEnd)
         {
-            // Calculate the intersection point of two lines
-            float cross = (v1.X * v2.Y - v1.Y * v2.X);
+            Vector2 segmentDirection = segmentEnd - segmentStart;
 
-            if (cross == 0)
+            // Calculate determinant
+            float cross = (rayDirection.X * segmentDirection.Y - rayDirection.Y * segmentDirection.X);
+            if (Math.Abs(cross) < 1e-6)
             {
-                // Lines are parallel
+                // Parallel or coincident lines
                 return Vector2.Zero;
             }
 
-            float t = ((p2.X - p1.X) * v2.Y + (p1.Y - p2.Y) * v2.X) / cross;
+            Vector2 delta = segmentStart - rayOrigin;
 
-            return p1 + t * v1;
+            float t = (delta.X * segmentDirection.Y - delta.Y * segmentDirection.X) / cross;
+            float u = (delta.X * rayDirection.Y - delta.Y * rayDirection.X) / cross;
+
+            // Check if intersection lies within the line segment
+            if (u >= 0 && u <= 1 && t >= 0) // u checks segment bounds, t ensures ray direction
+            {
+                return rayOrigin + t * rayDirection;
+            }
+
+            return Vector2.Zero;
         }
+
     }
 }

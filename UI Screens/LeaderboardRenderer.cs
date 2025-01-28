@@ -16,30 +16,26 @@ namespace Grapple
     {
         Button pauseButton;
         Texture2D pauseButtonTexture;
-        SpriteFont spriteFont;
-
-        public LeaderboardRenderer(ContentManager content)
+        SpriteFont leaderboardFont;
+        
+        public LeaderboardRenderer()
         {
-            pauseButtonTexture = content.Load<Texture2D>("pause_button");
-            pauseButton = new Button("pause", pauseButtonTexture, 700, 35);
-            spriteFont = content.Load<SpriteFont>("galleryFont");
-
+            pauseButtonTexture = Globals.Content.Load<Texture2D>("pause_button");
+            pauseButton = new Button("Pause", pauseButtonTexture, 700, 35);
+            leaderboardFont = Globals.Content.Load<SpriteFont>("LeaderboardFont");
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw()
         {
+            pauseButton.Display();
 
+            Globals.SpriteBatch.DrawString(leaderboardFont, "Leaderboard", new Vector2(100, 50), Color.White);
 
-            pauseButton.Update();
-            pauseButton.Draw(spriteBatch, spriteFont);
-           
-            spriteBatch.DrawString(spriteFont, "Leaderboard", new Vector2(100, 50), Color.White);
+            Globals.SpriteBatch.DrawString(leaderboardFont, $"{Globals.HighScoreManager.HighScores[0].Key,-12} - {Globals.HighScoreManager.HighScores[0].Value, 4}", new Vector2(100, 160), Color.LightGray);
 
-            spriteBatch.DrawString(spriteFont, "1. Unknown", new Vector2(100, 150), Color.White);
+            Globals.SpriteBatch.DrawString(leaderboardFont, $"{Globals.HighScoreManager.HighScores[1].Key,-12} - {Globals.HighScoreManager.HighScores[1].Value, 4}", new Vector2(100, 200), Color.LightGray);
 
-            spriteBatch.DrawString(spriteFont, "2. Unknown", new Vector2(100, 200), Color.White);
-
-            spriteBatch.DrawString(spriteFont, "3. Unknown", new Vector2(100, 250), Color.White);
+            Globals.SpriteBatch.DrawString(leaderboardFont, $"{Globals.HighScoreManager.HighScores[2].Key,-12} - {Globals.HighScoreManager.HighScores[2].Value, 4}", new Vector2(100, 240), Color.LightGray);
 
         }
     }
