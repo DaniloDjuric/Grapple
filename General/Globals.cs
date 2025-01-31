@@ -1,4 +1,5 @@
 ﻿using Grapple.Level;
+using Grapple.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Grapple
+namespace Grapple.General
 {
 
     public static class Globals
@@ -29,7 +30,7 @@ namespace Grapple
         {
             var distance = Vector2.Distance(point1, point2);
             var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-            DrawLine(spriteBatch, point1, distance, angle, color, thickness);
+            spriteBatch.DrawLine(point1, distance, angle, color, thickness);
         }
 
         public static void DrawLine(this SpriteBatch spriteBatch, Vector2 point, float length, float angle, Color color, float thickness = 1f)
@@ -41,10 +42,10 @@ namespace Grapple
 
         public static void DrawRect(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, float thickness = 1f)
         {
-            DrawLine(Globals.SpriteBatch, new Vector2(rectangle.X, rectangle.Y), new Vector2(rectangle.X + rectangle.Width, rectangle.Y), color, thickness);
-            DrawLine(Globals.SpriteBatch, new Vector2(rectangle.X + rectangle.Width, rectangle.Y), new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), color, thickness);
-            DrawLine(Globals.SpriteBatch, new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y + rectangle.Height), color, thickness);
-            DrawLine(Globals.SpriteBatch, new Vector2(rectangle.X, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y), color, thickness);
+            SpriteBatch.DrawLine(new Vector2(rectangle.X, rectangle.Y), new Vector2(rectangle.X + rectangle.Width, rectangle.Y), color, thickness);
+            SpriteBatch.DrawLine(new Vector2(rectangle.X + rectangle.Width, rectangle.Y), new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), color, thickness);
+            SpriteBatch.DrawLine(new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y + rectangle.Height), color, thickness);
+            SpriteBatch.DrawLine(new Vector2(rectangle.X, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y), color, thickness);
         }
 
         public static readonly Rectangle PlayableArea = new Rectangle(10, 10, 790, 470); // 10 less on each side to avoid glitching out of the level
@@ -54,7 +55,8 @@ namespace Grapple
         public static float TotalSeconds { get; set; }
         public static ContentManager Content { get; set; }
         public static SpriteBatch SpriteBatch { get; set; }
-        public static void Update(GameTime gameTime) { 
+        public static void Update(GameTime gameTime)
+        {
             TotalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
 

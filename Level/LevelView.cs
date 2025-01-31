@@ -6,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Grapple.General;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,12 +47,12 @@ namespace Grapple.Level
             menuRenderer = new MenuRenderer();
             leaderboardRenderer = new LeaderboardRenderer();
 
-            ninjaIdle = Globals.Content.Load<Texture2D>("IDLE");
+            ninjaIdle = Globals.Content.Load<Texture2D>("DASH");
             ninjaAttack = Globals.Content.Load<Texture2D>("ATTACK 1");
             balloonSprite = Globals.Content.Load<Texture2D>("balloon");
             platformSprite = Globals.Content.Load<Texture2D>("platform");
 
-            flyAnimation = new(ninjaIdle, 10, 0.1f);
+            flyAnimation = new(ninjaIdle, 8, 0.1f);
             attackAnimation = new(ninjaAttack, 7, 0.1f);
         }
 
@@ -87,18 +88,17 @@ namespace Grapple.Level
                         Color.Lime);
 
                     // Baloon hitbox - debug
-                    //Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height), Color.DarkRed);
+                    Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)enemy.X, (int)enemy.Y, (int)enemy.Width, (int)enemy.Height), Color.DarkRed);
                 }
 
                 // Draw player
                 flyAnimation.Update();
-                flyAnimation.Draw(levelModel.Player.Position);
+                flyAnimation.Draw(levelModel.Player.Position, LevelController.targetPosition.X >= levelModel.Player.X);
 
                 // Player hitbox - debug
-                //Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height), Color.Green);
+                Globals.DrawRect(Globals.SpriteBatch, new Rectangle((int)levelModel.Player.X, (int)levelModel.Player.Y, (int)levelModel.Player.Width, (int)levelModel.Player.Height), Color.Green);
 
-                // Grapple
-                //Globals.DrawLine(Globals.SpriteBatch, levelModel.Player.Position, Physics.CalculateTargetPosition(levelModel.Player.Position, Mouse.GetState().Position.ToVector2()), Color.Black, 3);
+                Globals.DrawLine(Globals.SpriteBatch, levelModel.Player.Center, Physics.CalculateTargetPosition(levelModel.Player.Center, LevelController.targetPosition), Color.Black, 3);
 
                 // UI  
                 uiRenderer.Draw(time);

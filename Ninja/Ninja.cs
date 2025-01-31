@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-
+/*
 namespace Grapple.Ninja
 {
 
@@ -37,4 +37,4 @@ namespace Grapple.Ninja
             animation.Draw(position);
         }
     }
-}
+}*/

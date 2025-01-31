@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Grapple.General;
+using Grapple.Managers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,25 +34,19 @@ namespace Grapple.Level
         private float popSoundVolume = 0.6f;
         private Song mainSong;
 
+        public static Vector2 targetPosition;
         private bool Moving = false;
         private Vector2 clickPosition;
-        private Vector2 targetPosition;
         private int clickCounter; 
         private int totalClicksAllowed = 1; 
 
 
         public LevelController(LevelModel model, LevelView view)
         {
+            AudioManager.LoadContent();
+
             levelModel = model;
             levelView = view;
-
-            popSoundEffect = Globals.Content.Load<SoundEffect>(@"Sounds\\pop-sound");
-            mainSong = Globals.Content.Load<Song>(@"Sounds\\main-song");
-
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Volume = 0.2f;
-            MediaPlayer.Play(mainSong);
-
         }
 
         // TouchPanel.GetState();    =>      For mobile funcionality
@@ -58,9 +54,8 @@ namespace Grapple.Level
 
         public void Update(GameTime gameTime)
         {
-        
-            if (LevelView.paused) MediaPlayer.Volume = 0.05f;
-            else MediaPlayer.Volume = 0.2f;
+            AudioManager.AdjustMusicVolume(LevelView.paused);
+
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
@@ -118,7 +113,7 @@ namespace Grapple.Level
                 levelModel.Balloons[0].Y = new Random().NextInt64(400);
 
 
-                popSoundEffect.Play();
+                AudioManager.PlayPopSound();
                 LevelModel.Score++;
             }
         }

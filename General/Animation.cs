@@ -9,11 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Grapple
+namespace Grapple.General
 {
 
     internal class Animation
-    {        
+    {
         private readonly Texture2D _texture;
         private readonly List<Rectangle> _sourceRectangles = new();
 
@@ -29,7 +29,7 @@ namespace Grapple
             _frameTimeLeft = _frameTime;
             _totalFrames = framesX;
 
-            var frameWidth = (_texture.Width / framesX);
+            var frameWidth = _texture.Width / framesX;
             var frameHeight = _texture.Height;
 
             for (int i = 0; i < _totalFrames; i++)
@@ -43,7 +43,8 @@ namespace Grapple
         {
             _frameTimeLeft -= Globals.TotalSeconds;
 
-            if (_frameTimeLeft <= 0) {
+            if (_frameTimeLeft <= 0)
+            {
                 _frameTimeLeft += _frameTime;
                 _frame = (_frame + 1) % _totalFrames;
             }
@@ -51,9 +52,20 @@ namespace Grapple
         }
 
 
-        public void Draw(Vector2 pos)
+        public void Draw(Vector2 pos, bool isFacingRight)
         {
-            Globals.SpriteBatch.Draw(_texture, pos, _sourceRectangles[_frame], Color.White, 0f, new Vector2(), new Vector2(2.5f, 2.5f), new SpriteEffects(), 0f) ;
+            Globals.SpriteBatch.Draw(
+                _texture,
+                pos,
+                _sourceRectangles[_frame],
+                Color.White,
+                0f,
+                isFacingRight ? new Vector2(10, 0) : new Vector2(30, 0),
+                new Vector2(2.5f, 2.5f),
+                isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally // Fliping the sprite
+                , 0f);
+
+
         }
     }
 }

@@ -9,10 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Grapple
+namespace Grapple.General
 {
     internal static class Physics
-    { 
+    {
         public static LevelModel levelModel { get; set; }
 
         public static void MoveTowards(Vector2 targetPosition, GameTime gameTime, ref bool Moving, PlayerModel player)
@@ -25,7 +25,6 @@ namespace Grapple
             // Add clamping to stop overshooting
             if (Vector2.Distance(newPosition, targetPosition) < Vector2.Distance(player.Position, newPosition))
             {
-                Debug.Write("Overshoot-snappign\n");
                 newPosition = targetPosition; // Snap to the target
                 Moving = false; // Stop movement
             }
@@ -66,14 +65,6 @@ namespace Grapple
             return new Vector2(adjustedX, adjustedY);
         }
 
-        public static Vector2 GetAdjustedTargetPosition(Vector2 targetPosition, float playerWidth, float playerHeight)
-        {
-            float adjustedX = Math.Clamp(targetPosition.X, 0, Globals.PlayableArea.Width - playerWidth);
-            float adjustedY = Math.Clamp(targetPosition.Y, 0, Globals.PlayableArea.Height - playerHeight);
-
-            return new Vector2(adjustedX, adjustedY);
-        }
-
         private static bool HasReachedTarget(Vector2 newPosition, Vector2 targetPosition, PlayerModel player)
         {
             // Define the player's bounding box
@@ -84,8 +75,8 @@ namespace Grapple
             Globals.RectangleF targetBounds = new Globals.RectangleF(
                 targetPosition.X - targetTolerance,
                 targetPosition.Y - targetTolerance,
-                targetTolerance,
-                targetTolerance
+                targetTolerance * 2,
+                targetTolerance * 2
             );
 
             // Check for intersection
@@ -146,7 +137,7 @@ namespace Grapple
             Vector2 segmentDirection = segmentEnd - segmentStart;
 
             // Calculate determinant
-            float cross = (rayDirection.X * segmentDirection.Y - rayDirection.Y * segmentDirection.X);
+            float cross = rayDirection.X * segmentDirection.Y - rayDirection.Y * segmentDirection.X;
             if (Math.Abs(cross) < 1e-6)
             {
                 // Parallel or coincident lines
