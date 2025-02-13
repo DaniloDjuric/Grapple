@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Grapple.General;
 using Grapple.Level;
+using Grapple.UI_Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,11 +27,13 @@ namespace Grapple
         private LevelController levelController;
         private LevelModel levelModel;
         private LevelView levelView;
+        private StartMenuRenderer startMenu;
 
         public static int currentLevel = 1;
         public GameController(ContentManager content)
         {
             levelModel = new LevelModel();
+            startMenu = new StartMenuRenderer();
             levelModel.LoadObjectsFromJson($"..\\..\\..\\scene_{currentLevel}.json");
             levelView = new LevelView(levelModel);
             levelController = new LevelController(levelModel, levelView);
@@ -53,15 +56,14 @@ namespace Grapple
         // These two are being called from "Main"
         public void Update(GameTime gameTime)
         {
-            // Logic + menuController.Update();
-            levelController.Update(gameTime); 
+            if (Globals.GameRunning) levelController.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Later this can call "MenuController.Draw" when I have a Menu
-            // and have logic for knowing what scene should be drawn
-            levelController.Draw();
+
+            if (Globals.GameRunning) levelController.Draw();
+            else startMenu.Draw();
         }
     }
 

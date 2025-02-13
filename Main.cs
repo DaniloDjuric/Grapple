@@ -29,7 +29,7 @@ namespace Grapple
             Globals.Camera = new Camera();
             Globals.TotalSeconds = 0;
             Globals.Content = Content;
-            Globals.GameRunning = true;
+            Globals.GameRunning = false;
             Globals.HighScoreManager = new HighScoreManager();
             Globals.GameInstance = this;
             base.Initialize();

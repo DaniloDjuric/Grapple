@@ -121,7 +121,7 @@ namespace Grapple.Level
                 balloon.X = new Random().NextInt64(750);
                 balloon.Y = new Random().NextInt64(400);
 
-                Globals.Camera.StartShake(2f, 0.3f); // Shake with intensity 5 for 0.3 seconds
+                Globals.Camera.StartShake(1f, 0.2f); // Shake with intensity 1 for 0.2 seconds
                 AudioManager.PlayPopSound();
                 LevelModel.Score++;
             }

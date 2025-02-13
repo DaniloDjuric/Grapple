@@ -38,8 +38,15 @@ namespace Grapple
             this.Texture = texture;
             this.ButtonX = buttonX;
             this.ButtonY = buttonY;
-            this.Rect = new(buttonX, buttonY, (int)Math.Round(texture.Width* 0.05), (int)Math.Round(texture.Height * 0.05));
             this.Color = Color.DarkGray;
+            if(name == "Play")
+            {
+                this.Rect = new(buttonX, buttonY, (int)Math.Round(texture.Width * 0.2), (int)Math.Round(texture.Height * 0.2));
+            }
+            else
+            {
+                this.Rect = new(buttonX, buttonY, (int)Math.Round(texture.Width* 0.05), (int)Math.Round(texture.Height * 0.05));
+            }
 
             previousMouseState = Mouse.GetState();
         }
@@ -79,11 +86,15 @@ namespace Grapple
 
             if (enterButton() && previousMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
             {
+                if (Name == "Play") AudioManager.PlayPopSound();
 
                 AudioManager.PlayButtonSound();
 
                 switch (Name)
                 {
+                    case "Play":
+                        Globals.GameRunning = true;
+                        break;
                     case "Pause":
                         LevelModel.isPaused = !LevelModel.isPaused;
                         LevelModel.isLeaderboardOpen = false;
@@ -136,7 +147,11 @@ namespace Grapple
             // Drawing the button texture/text
             if (Texture != null)
             {
-                Globals.SpriteBatch.Draw(Texture, new Vector2(ButtonX, ButtonY), new Rectangle(0, 0, Texture.Width, Texture.Height), this.Color, 0f, new Vector2(), new Vector2(0.05f, 0.05f), new SpriteEffects(), 0f);
+                if (Name == "Play")
+                {
+                    Globals.SpriteBatch.Draw(Texture, new Vector2(ButtonX, ButtonY), new Rectangle(0, 0, Texture.Width, Texture.Height), this.Color, 0f, Vector2.One, 0.2f, SpriteEffects.None, 0f);
+                }
+                else Globals.SpriteBatch.Draw(Texture, new Vector2(ButtonX, ButtonY), new Rectangle(0, 0, Texture.Width, Texture.Height), this.Color, 0f, new Vector2(), 0.05f, new SpriteEffects(), 0f);
             }
             else
             {
