@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Grapple.General;
+using Grapple.UI_Screens;
 
 namespace Grapple
 {
@@ -32,7 +33,12 @@ namespace Grapple
             SpriteFont SpriteFont = Globals.Content.Load<SpriteFont>("galleryFont");
 
             pauseButton.Display();
-            
+
+            if (LevelController.autoAim)
+            {
+                Globals.DrawRect(Globals.SpriteBatch, new Rectangle(10, 10, 780, 460), Color.MediumVioletRed, 5);
+            }
+
             if (Globals.GameRunning)
             {
                 // In Level UI
@@ -50,8 +56,9 @@ namespace Grapple
             else
             {
                 // Game Over UI
-                Globals.SpriteBatch.DrawString(SpriteFont, "Game Over", new Vector2(300, 200), Color.White);
-                Globals.SpriteBatch.DrawString(SpriteFont, $"Your final score is: {LevelModel.Score}", new Vector2(200, 270), Color.White);
+                Globals.SpriteBatch.DrawString(SpriteFont, "Game Over", new Vector2(300, 50), Color.White);
+                Globals.SpriteBatch.DrawString(SpriteFont, $"Your name:", new Vector2(200, 290), Color.White);
+                Globals.SpriteBatch.DrawString(SpriteFont, $"Your final score is: {LevelModel.Score}", new Vector2(200, 340), Color.White);
             }
         }
     }

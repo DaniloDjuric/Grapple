@@ -55,6 +55,13 @@ namespace Grapple.General
         public static float TotalSeconds { get; set; }
         public static ContentManager Content { get; set; }
         public static SpriteBatch SpriteBatch { get; set; }
+        public static Camera Camera { get; set; }
+        public static GraphicsDevice GraphicsDevice { get; set; }
+        public static LevelModel LevelModelInstance { get; set; }
+        public static GameController GameControllerReference { get; set; }
+        public static Game GameInstance { get; set; }
+
+        public static Color darkBG = new Color(40, 40, 40);
         public static void Update(GameTime gameTime)
         {
             TotalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;

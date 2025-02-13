@@ -17,6 +17,7 @@ namespace Grapple.General
 
         public static void MoveTowards(Vector2 targetPosition, GameTime gameTime, ref bool Moving, PlayerModel player)
         {
+            Debug.Write(Moving, "\n");
             if (!Moving) return; // Skip movement if not moving
 
             Vector2 direction = Vector2.Normalize(targetPosition - player.Position);
@@ -35,7 +36,7 @@ namespace Grapple.General
             {
                 Vector2 adjustedPosition = GetSnappedPosition(targetPosition, player);
                 player.Position = adjustedPosition; // Snap adjusted position
-                Moving = false; // Stop moving
+                Moving = false ; // Stop moving
             }
             else
             {

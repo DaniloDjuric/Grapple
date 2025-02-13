@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Grapple.Models
 {
-    internal class PlatformModel
+    public class PlatformModel
     {
         [JsonPropertyName("X")]
         public float X { get; set; }

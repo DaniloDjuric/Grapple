@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Grapple.Level;
 using Microsoft.Xna.Framework.Audio;
 using Grapple.General;
+using Grapple.Managers;
 
 namespace Grapple
 {
@@ -21,22 +22,15 @@ namespace Grapple
         private Color Color;
         private MouseState previousMouseState;
 
-        private SoundEffect buttonSoundEffect;
-        private float buttonSoundVolume = 0.7f;
-        private SoundEffectInstance buttonSoundEffectInstance;
-
         public Button(string name, int width, int height, int buttonX, int buttonY)
         {
             this.Name = name;
             this.ButtonX = buttonX;
             this.ButtonY = buttonY;
             this.Rect = new(buttonX, buttonY, width, height);
-            this.Color = Color.CornflowerBlue;
+            this.Color = Color.Red;
 
             previousMouseState = Mouse.GetState();
-
-            buttonSoundEffect = Globals.Content.Load<SoundEffect>(@"Sounds\\button-sound");
-            buttonSoundEffectInstance = buttonSoundEffect.CreateInstance();
         }
         public Button(string name, Texture2D texture, int buttonX, int buttonY)
         {
@@ -45,12 +39,9 @@ namespace Grapple
             this.ButtonX = buttonX;
             this.ButtonY = buttonY;
             this.Rect = new(buttonX, buttonY, (int)Math.Round(texture.Width* 0.05), (int)Math.Round(texture.Height * 0.05));
-            this.Color = Color.Black;
+            this.Color = Color.DarkGray;
 
             previousMouseState = Mouse.GetState();
-
-            buttonSoundEffect = Globals.Content.Load<SoundEffect>(@"Sounds\\button-sound");
-            buttonSoundEffectInstance = buttonSoundEffect.CreateInstance();
         }
 
         /**
@@ -63,12 +54,19 @@ namespace Grapple
 
             if (cursor.Intersects(Rect))
             {
-                this.Color = Color.LightGray;
+                if (Name != "Mute Song" && Name != "Mute Effects")
+                {
+                    this.Color = Color.LightGray;
+                }
                 return true;
+
             }
             else
             {
-                this.Color = Color.Black;
+                if(Name != "Mute Song" && Name != "Mute Effects")
+                {
+                    this.Color = Color.DarkGray;
+                }
                 return false;
             }
         }
@@ -81,24 +79,54 @@ namespace Grapple
 
             if (enterButton() && previousMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
             {
-                buttonSoundEffectInstance.Volume = buttonSoundVolume;
-                buttonSoundEffectInstance.Play();
+
+                AudioManager.PlayButtonSound();
+
                 switch (Name)
                 {
                     case "Pause":
-                        LevelView.paused = !LevelView.paused;
-                        LevelView.leaderboard = false;
+                        LevelModel.isPaused = !LevelModel.isPaused;
+                        LevelModel.isLeaderboardOpen = false;
+                        LevelModel.isSettingsOpen = false;
                         break;
                     case "Restart level":
-                        LevelView.paused = false;
-                        LevelView.time = 60000;
-                        LevelModel.Score = 0;
+                        Globals.LevelModelInstance.RestartLevel();
                         break;
                     case "Leaderboard":
-                        LevelView.leaderboard = true;
+                        LevelModel.isLeaderboardOpen = true;
                         break;
                     case "Quit":
-                        //Game.Exit();
+                        Globals.GameInstance.Exit();
+                        break;
+                    case "Settings":
+                        LevelModel.isSettingsOpen = true;
+                        break;
+                    case "Next level":
+                        if (GameController.currentLevel >= 4)
+                        {
+                            GameController.currentLevel = 1;
+                        }
+                        else
+                        {
+                            GameController.currentLevel += 1;
+                        }
+                        Globals.GameControllerReference.LoadLevel();
+                        Globals.LevelModelInstance.RestartLevel();
+                        break;
+                    case "Mute Song":
+                        AudioManager.muteSong = !AudioManager.muteSong;
+                        if (AudioManager.muteSong) {
+                            this.Color = Color.Green;
+                        }else this.Color = Color.Red;
+                        break;
+                    case "Mute Effects":
+                        AudioManager.muteSoundEffects = !AudioManager.muteSoundEffects;
+                        if (AudioManager.muteSoundEffects)
+                        {
+                            this.Color = Color.Green;
+                        }
+                        else this.Color = Color.Red;
+
                         break;
                     default:
                         break;

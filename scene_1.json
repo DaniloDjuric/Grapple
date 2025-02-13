@@ -1,0 +1,51 @@
+{
+    "Player": {
+
+        "X": 10,
+        "Y": 150,
+        "Width": 60,
+        "Height": 96,
+        "Speed": 500
+    },
+    "Platforms": [
+        {
+            "X": 0,
+            "Y": 0,
+            "Width": 800,
+            "Height": 20
+        },
+        {
+            "X": 0,
+            "Y": 460,
+            "Width": 800,
+            "Height": 20
+        },
+        {
+            "X": 780,
+            "Y": 0,
+            "Width": 20,
+            "Height": 480
+        },
+        {
+            "X": 0,
+            "Y": 0,
+            "Width": 20,
+            "Height": 480
+        },
+        {
+            "X": 250,
+            "Y": 200,
+            "Width": 300,
+            "Height": 10
+        }
+    ],
+
+    "Balloons": [
+        {
+            "X": 200,
+            "Y": 100,
+            "Width": 40,
+            "Height": 60
+        }
+    ]
+}

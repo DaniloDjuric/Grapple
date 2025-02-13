@@ -26,17 +26,21 @@ namespace Grapple
 
         protected override void Initialize()
         {
+            Globals.Camera = new Camera();
             Globals.TotalSeconds = 0;
             Globals.Content = Content;
             Globals.GameRunning = true;
             Globals.HighScoreManager = new HighScoreManager();
+            Globals.GameInstance = this;
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            Globals.SpriteBatch = new SpriteBatch(GraphicsDevice);
             gameController = new GameController(Content);
+            Globals.GameControllerReference = gameController;
+            Globals.GraphicsDevice = GraphicsDevice;
+            Globals.SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         // Where the controller gets updated. 
@@ -62,7 +66,7 @@ namespace Grapple
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // SpriteBatch initializing before being passed into the controller, and ending after use.
-            Globals.SpriteBatch.Begin();
+            Globals.SpriteBatch.Begin(transformMatrix: Globals.Camera.GetViewMatrix());
             gameController.Draw(Globals.SpriteBatch);
             Globals.SpriteBatch.End();
 

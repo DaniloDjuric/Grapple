@@ -21,24 +21,35 @@ namespace Grapple
      *  - Keep track of high scores and currency                
      */
 
-    internal class GameController
+    public class GameController
     {
         private LevelController levelController;
         private LevelModel levelModel;
         private LevelView levelView;
 
+        public static int currentLevel = 1;
         public GameController(ContentManager content)
         {
             levelModel = new LevelModel();
-            levelModel.LoadObjectsFromJson("..\\..\\..\\scene.json");
-            levelView = new LevelView();
+            levelModel.LoadObjectsFromJson($"..\\..\\..\\scene_{currentLevel}.json");
+            levelView = new LevelView(levelModel);
             levelController = new LevelController(levelModel, levelView);
             
+            Globals.LevelModelInstance = levelModel;
             Physics.levelModel = levelModel;
 
             //menuController = new MenuController(menuModel, menuView);
         }
+        public void LoadLevel()
+        {
+            levelModel = new LevelModel();
+            levelModel.LoadObjectsFromJson($"..\\..\\..\\scene_{currentLevel}.json");
+            levelView = new LevelView(levelModel);
+            levelController = new LevelController(levelModel, levelView);
 
+            Globals.LevelModelInstance = levelModel;
+            Physics.levelModel = levelModel;
+        }
         // These two are being called from "Main"
         public void Update(GameTime gameTime)
         {

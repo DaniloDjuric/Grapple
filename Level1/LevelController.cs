@@ -1,5 +1,6 @@
 ﻿using Grapple.General;
 using Grapple.Managers;
+using Grapple.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -19,27 +20,18 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace Grapple.Level
 {
-    /*  Level Controller tasks:
-     *  - Handle Balloon spawning and other game logic
-     *  - Handle player input for Ninja's movement
-     *  - Calls for collision detection, AI, etc.              
-     */
-
     internal class LevelController
     {
         private LevelModel levelModel;
         private LevelView levelView;
 
-        private SoundEffect popSoundEffect;
-        private float popSoundVolume = 0.6f;
-        private Song mainSong;
-
         public static Vector2 targetPosition;
         private bool Moving = false;
         private Vector2 clickPosition;
         private int clickCounter; 
-        private int totalClicksAllowed = 1; 
+        private int totalClicksAllowed = 1;
 
+        public static bool autoAim;
 
         public LevelController(LevelModel model, LevelView view)
         {
@@ -49,31 +41,43 @@ namespace Grapple.Level
             levelView = view;
         }
 
-        // TouchPanel.GetState();    =>      For mobile funcionality
-        // (The rest of the code stays mostly the same, Mouse will be used for easier testing) 
-
         public void Update(GameTime gameTime)
         {
-            AudioManager.AdjustMusicVolume(LevelView.paused);
+            AudioManager.AdjustMusicVolume(LevelModel.isPaused);
+            Globals.Camera.Update(gameTime);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                autoAim = true;
+                ChangeTarget();
+            }
 
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 ChangeTarget();
             }
-            BalloonCollissionCheck(gameTime);
 
+            BalloonCollissionCheck(gameTime);
+            
             Physics.MoveTowards(targetPosition, gameTime, ref Moving, levelModel.Player);
 
             if (!Moving)
             {
                 clickCounter = totalClicksAllowed;
             }
-
-            if (!Globals.GameRunning && Globals.HighScoreManager.scoresUpdated == false)
+            if (!Globals.GameRunning && !Globals.HighScoreManager.scoresUpdated && !levelView.nameInputUI.IsActive())
             {
-                Globals.HighScoreManager.UpdateHighScores("Danilo", LevelModel.Score);
-                Globals.HighScoreManager.scoresUpdated = true;
+                string playerName = levelView.nameInputUI.GetPlayerName();
+                if (!string.IsNullOrEmpty(playerName))
+                {
+                    Globals.HighScoreManager.UpdateHighScores(playerName, LevelModel.Score);
+                    Globals.HighScoreManager.scoresUpdated = true;
+                }
+            }
+            foreach (BalloonModel balloon in levelModel.Balloons)
+            {
+                balloon.MoveAway(levelModel.Player.Position);
             }
 
             levelView.Update(gameTime);
@@ -82,11 +86,14 @@ namespace Grapple.Level
         // Avoid accidental multi-clicks
         private void ChangeTarget()
         {
-            if (!Globals.GameRunning) return;
-
-            if (clickCounter <= 0) return;
+            if (!Globals.GameRunning || clickCounter <= 0 || LevelModel.isPaused) return;
 
             Vector2 newClickPosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            
+            if (autoAim)
+            {
+                newClickPosition = Globals.LevelModelInstance.Balloons[0].Position;
+            }
 
             if (newClickPosition != clickPosition)
             {
@@ -103,16 +110,18 @@ namespace Grapple.Level
                     Debug.WriteLine("Invalid target position calculated");
                 }
             }
+            if (!Moving) autoAim = false;
         }
 
         private void BalloonCollissionCheck(GameTime gameTime)
         {
-            if (Physics.CheckCollision_p_b(levelModel.Balloons[0]))
+            foreach (BalloonModel balloon in levelModel.Balloons)
+            if (Physics.CheckCollision_p_b(balloon))
             {
-                levelModel.Balloons[0].X = new Random().NextInt64(750);
-                levelModel.Balloons[0].Y = new Random().NextInt64(400);
+                balloon.X = new Random().NextInt64(750);
+                balloon.Y = new Random().NextInt64(400);
 
-
+                Globals.Camera.StartShake(2f, 0.3f); // Shake with intensity 5 for 0.3 seconds
                 AudioManager.PlayPopSound();
                 LevelModel.Score++;
             }
@@ -122,9 +131,6 @@ namespace Grapple.Level
         {
             // Tells the View to draw, with the atributes (position, size, ...) stored in the Model
             levelView.Draw(levelModel);
-
-            Globals.DrawLine(Globals.SpriteBatch, levelModel.Player.Center, Physics.CalculateTargetPosition(levelModel.Player.Center, targetPosition), Color.Black, 3);
-
         }
     }
 

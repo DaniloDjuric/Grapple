@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Grapple.Models
 {
-    internal class PlayerModel
+    public class PlayerModel
     {
         [JsonPropertyName("X")]
         public float X { get; set; }
